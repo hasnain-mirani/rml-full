@@ -5,23 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { caseStudies } from "@/app/data/portfolio";
 
-const cardMotion = {
-  initial: { y: 0, scale: 1 },
-  hover: {
-    y: -10,
-    scale: 1.01,
-    transition: { type: "spring", stiffness: 260, damping: 18 },
-  },
-};
 
-const imageMotion = {
-  initial: { y: 0, scale: 1 },
-  hover: {
-    y: -6,
-    scale: 1.04,
-    transition: { type: "spring", stiffness: 240, damping: 16 },
-  },
-};
 
 export default function PortfolioCards() {
   return (
@@ -33,7 +17,7 @@ export default function PortfolioCards() {
           className="group"
         >
           <motion.article
-            variants={cardMotion}
+            
             initial="initial"
             whileHover="hover"
             className="rounded-[18px] bg-[#C8A7FF] p-6 shadow-[0_10px_25px_rgba(83,35,143,0.12)] transition-shadow"
@@ -41,7 +25,7 @@ export default function PortfolioCards() {
             {/* Image box */}
             <div className="rounded-[14px] bg-white/20 p-4">
               <motion.div
-                variants={imageMotion}
+                
                 className="relative mx-auto h-[140px] w-full max-w-[220px] md:h-[160px] md:max-w-[240px]"
               >
                 <Image

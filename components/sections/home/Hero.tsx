@@ -4,27 +4,8 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 18 },
-  show: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: "easeOut", delay },
-  }),
-};
 
-const floaty = {
-  initial: { y: 0 },
-  animate: (d = 0) => ({
-    y: [0, -10, 0],
-    transition: {
-      duration: 5.5,
-      ease: "easeInOut",
-      repeat: Infinity,
-      delay: d,
-    },
-  }),
-};
+
 
 export default function Hero() {
   return (
@@ -33,7 +14,7 @@ export default function Hero() {
       <div className="mx-auto max-w-6xl px-4 pt-14 md:pt-16">
         <div className="text-center">
           <motion.h1
-            variants={fadeUp}
+            
             initial="hidden"
             animate="show"
             custom={0}
@@ -44,7 +25,7 @@ export default function Hero() {
           </motion.h1>
 
           <motion.p
-            variants={fadeUp}
+         
             initial="hidden"
             animate="show"
             custom={0.08}
@@ -55,7 +36,7 @@ export default function Hero() {
           </motion.p>
 
           <motion.div
-            variants={fadeUp}
+     
             initial="hidden"
             animate="show"
             custom={0.16}
@@ -88,7 +69,7 @@ export default function Hero() {
           <div className="relative h-[360px] md:h-[460px]">
             {/* Center image */}
             <motion.div
-              variants={floaty}
+              
               initial="initial"
               animate="animate"
               custom={0}
@@ -108,7 +89,7 @@ export default function Hero() {
 
             {/* Left image */}
             <motion.div
-              variants={floaty}
+          
               initial="initial"
               animate="animate"
               custom={0.4}
@@ -127,7 +108,7 @@ export default function Hero() {
 
             {/* Right image */}
             <motion.div
-              variants={floaty}
+             
               initial="initial"
               animate="animate"
               custom={0.8}
@@ -146,7 +127,7 @@ export default function Hero() {
 
             {/* ✅ Mobile: show left/right smaller so it still feels like figma */}
             <motion.div
-              variants={floaty}
+          
               initial="initial"
               animate="animate"
               custom={0.4}
@@ -164,7 +145,7 @@ export default function Hero() {
             </motion.div>
 
             <motion.div
-              variants={floaty}
+             
               initial="initial"
               animate="animate"
               custom={0.8}
