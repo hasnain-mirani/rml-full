@@ -33,7 +33,6 @@ export default function Navbar({
 
   const lastY = useRef(0);
 
-<<<<<<< HEAD
   useEffect(() => {
     const el = scrollContainerRef.current;
     if (!el) return;
@@ -55,17 +54,6 @@ export default function Navbar({
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => el.removeEventListener("scroll", onScroll);
   }, [scrollContainerRef]);
-=======
-  // show/hide on scroll direction
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    const prev = scrollY.getPrevious() ?? 0;
-
-    setScrolled(latest > 8);
-
-    if (latest > prev && latest > 120) setHidden(true);
-    else setHidden(false);
-  });
->>>>>>> 05a6afdc887990c2e3f985aab48c0d1e34da811a
 
   const activeLabel = useMemo(() => {
     const found = navLinks.find((l) => isRouteActive(pathname, l.href));
@@ -108,49 +96,11 @@ export default function Navbar({
                       : "text-white/90 hover:text-white"
                   )}
                 >
-<<<<<<< HEAD
                   {l.label}
                 </Link>
               );
             })}
           </nav>
-=======
-                  <div className="grid">
-                    {navLinks.map((l) => {
-                      const active = isRouteActive(pathname, l.href);
-                      return (
-                        <Link
-                          key={l.href}
-                          href={l.href}
-                          onClick={() => setMobileOpen(false)}
-                          className={cn(
-                            "flex items-center justify-between px-5 py-4 text-sm font-medium",
-                            "transition-colors",
-                            active
-                              ? "bg-[#CDB6FF] text-[#1E1230]"
-                              : "text-white/90 hover:bg-white/10 hover:text-white"
-                          )}
-                        >
-                          <span>{l.label}</span>
-                          <span
-                            className={cn(
-                              "text-xs",
-                              active ? "text-[#1E1230]/70" : "text-white/60"
-                            )}
-                          >
-                            →
-                          </span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </motion.header>
->>>>>>> 05a6afdc887990c2e3f985aab48c0d1e34da811a
 
           <div className="ml-auto pr-4 text-xs text-white/70 md:hidden">
             {activeLabel}
