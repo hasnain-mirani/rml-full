@@ -1,4 +1,5 @@
-import { headers } from "next/headers";
+// lib/fetchBlogs.ts
+import { getBaseUrl } from "@/lib/getBaseUrl";
 
 export type Blog = {
   _id: string;
@@ -9,7 +10,7 @@ export type Blog = {
   content?: string;
   image?: string;
   published?: boolean;
-  createdAt?: string; // ✅ from timestamps
+  createdAt?: string;
   updatedAt?: string;
 };
 
@@ -23,7 +24,8 @@ type BlogSingleApiResponse =
   | { item?: Blog }
   | { data?: Blog }
   | { blog?: Blog }
-  | Blog;
+  | Blog
+  | null;
 
 function toArray(res: BlogListApiResponse): Blog[] {
   if (Array.isArray(res)) return res;
@@ -42,52 +44,47 @@ function toBlog(res: BlogSingleApiResponse): Blog | null {
   return (anyRes.blog ?? anyRes.item ?? anyRes.data ?? anyRes) as Blog;
 }
 
-async function getBaseUrl(): Promise<string> {
-  const env =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    process.env.SITE_URL ||
-    process.env.VERCEL_URL;
-
-  if (env) {
-    const withProto = env.startsWith("http") ? env : `https://${env}`;
-    return withProto.replace(/\/$/, "");
+async function safeText(res: Response) {
+  try {
+    return await res.text();
+  } catch {
+    return "";
   }
-
-  const h = await headers();
-  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
-  const proto = h.get("x-forwarded-proto") ?? "http";
-  return `${proto}://${host}`.replace(/\/$/, "");
 }
 
-async function serverUrl(path: string) {
-  return typeof window !== "undefined" ? path : `${await getBaseUrl()}${path}`;
-}
-
-/** ✅ Get all blogs (public default = published only)
- * Supports optional filters that the client can also apply locally.
- */
+/** ✅ LIST */
 export async function fetchBlogs(opts?: {
   includeDrafts?: boolean;
-  category?: string; // optional server filter
+  category?: string;
   time?: "all" | "7d" | "30d" | "90d" | "year";
 }) {
   const includeDrafts = opts?.includeDrafts ?? false;
 
-  const qp = new URLSearchParams();
-  if (!includeDrafts) qp.set("published", "1");
-  if (opts?.category && opts.category !== "all") qp.set("category", opts.category);
-  if (opts?.time && opts.time !== "all") qp.set("time", opts.time);
+  const qs = new URLSearchParams();
+  if (!includeDrafts) qs.set("published", "1");
+  if (opts?.category && opts.category !== "all") qs.set("category", opts.category);
+  if (opts?.time && opts.time !== "all") qs.set("time", opts.time);
 
-  const path = qp.toString() ? `/api/blog?${qp.toString()}` : "/api/blog";
-  const url = await serverUrl(path);
+  const base = getBaseUrl();
+  const url = `${base}/api/blog${qs.toString() ? `?${qs.toString()}` : ""}`;
 
   const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Failed to load blogs (${res.status})`);
+
+  if (!res.ok) {
+    const body = await safeText(res);
+    throw new Error(
+      `Failed to fetch blogs (${res.status} ${res.statusText}) URL: ${url} Body: ${body.slice(
+        0,
+        300
+      )}`
+    );
+  }
 
   const json = (await res.json()) as BlogListApiResponse;
   return toArray(json);
 }
 
+/** ✅ SINGLE by slug */
 export async function fetchBlogBySlug(
   slug: string,
   opts?: { includeDrafts?: boolean; publishedOnly?: boolean }
@@ -95,15 +92,25 @@ export async function fetchBlogBySlug(
   const includeDrafts = opts?.includeDrafts ?? false;
   const publishedOnly = opts?.publishedOnly ?? !includeDrafts;
 
-  const qp = new URLSearchParams();
-  qp.set("slug", slug);
-  if (publishedOnly) qp.set("published", "1");
+  const qs = new URLSearchParams({ slug });
+  if (publishedOnly) qs.set("published", "1");
 
-  const url = await serverUrl(`/api/blog?${qp.toString()}`);
+  const base = getBaseUrl();
+  const url = `${base}/api/blog?${qs.toString()}`;
+
   const res = await fetch(url, { cache: "no-store" });
 
   if (res.status === 404) return null;
-  if (!res.ok) throw new Error(`Failed to load blog (${res.status})`);
+
+  if (!res.ok) {
+    const body = await safeText(res);
+    throw new Error(
+      `Failed to fetch blog (${res.status} ${res.statusText}) URL: ${url} Body: ${body.slice(
+        0,
+        300
+      )}`
+    );
+  }
 
   const json = (await res.json()) as BlogSingleApiResponse;
   const blog = toBlog(json);
