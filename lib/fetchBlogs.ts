@@ -1,3 +1,4 @@
+// lib/fetchBlogs.ts
 import { headers } from "next/headers";
 
 export type Blog = {
@@ -9,7 +10,7 @@ export type Blog = {
   content?: string;
   image?: string;
   published?: boolean;
-  createdAt?: string; // ✅ from timestamps
+  createdAt?: string;
   updatedAt?: string;
 };
 
@@ -23,7 +24,8 @@ type BlogSingleApiResponse =
   | { item?: Blog }
   | { data?: Blog }
   | { blog?: Blog }
-  | Blog;
+  | Blog
+  | null;
 
 function toArray(res: BlogListApiResponse): Blog[] {
   if (Array.isArray(res)) return res;
@@ -43,9 +45,11 @@ function toBlog(res: BlogSingleApiResponse): Blog | null {
 }
 
 async function getBaseUrl(): Promise<string> {
+  // Prefer stable server envs first (Vercel provides these)
   const env =
     process.env.NEXT_PUBLIC_SITE_URL ||
     process.env.SITE_URL ||
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ||
     process.env.VERCEL_URL;
 
   if (env) {
@@ -53,6 +57,7 @@ async function getBaseUrl(): Promise<string> {
     return withProto.replace(/\/$/, "");
   }
 
+  // Fallback: build from request headers (works on server)
   const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
   const proto = h.get("x-forwarded-proto") ?? "http";
@@ -60,15 +65,24 @@ async function getBaseUrl(): Promise<string> {
 }
 
 async function serverUrl(path: string) {
-  return typeof window !== "undefined" ? path : `${await getBaseUrl()}${path}`;
+  // client => relative
+  if (typeof window !== "undefined") return path;
+  // server => absolute
+  return `${await getBaseUrl()}${path}`;
 }
 
-/** ✅ Get all blogs (public default = published only)
- * Supports optional filters that the client can also apply locally.
- */
+async function safeText(res: Response) {
+  try {
+    return await res.text();
+  } catch {
+    return "";
+  }
+}
+
+/** ✅ Get all blogs (public default = published only) */
 export async function fetchBlogs(opts?: {
   includeDrafts?: boolean;
-  category?: string; // optional server filter
+  category?: string;
   time?: "all" | "7d" | "30d" | "90d" | "year";
 }) {
   const includeDrafts = opts?.includeDrafts ?? false;
@@ -82,7 +96,16 @@ export async function fetchBlogs(opts?: {
   const url = await serverUrl(path);
 
   const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Failed to load blogs (${res.status})`);
+
+  if (!res.ok) {
+    const body = await safeText(res);
+    throw new Error(
+      `Failed to load blogs (${res.status} ${res.statusText}) URL: ${url} Body: ${body.slice(
+        0,
+        400
+      )}`
+    );
+  }
 
   const json = (await res.json()) as BlogListApiResponse;
   return toArray(json);
@@ -103,7 +126,16 @@ export async function fetchBlogBySlug(
   const res = await fetch(url, { cache: "no-store" });
 
   if (res.status === 404) return null;
-  if (!res.ok) throw new Error(`Failed to load blog (${res.status})`);
+
+  if (!res.ok) {
+    const body = await safeText(res);
+    throw new Error(
+      `Failed to load blog (${res.status} ${res.statusText}) URL: ${url} Body: ${body.slice(
+        0,
+        400
+      )}`
+    );
+  }
 
   const json = (await res.json()) as BlogSingleApiResponse;
   const blog = toBlog(json);
