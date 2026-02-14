@@ -29,3 +29,14 @@ export type Testimonial = {
   linkUrl?: string;
   published: boolean;
 };
+export type Portfolio = {
+  _id: string;         // ✅ REQUIRED for edit/delete
+  title: string;
+  slug: string;
+  excerpt?: string;
+  image?: string;
+  tags?: string[];
+  published?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};

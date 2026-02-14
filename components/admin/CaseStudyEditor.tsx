@@ -27,9 +27,15 @@ function toSlug(input: string) {
     .replace(/-+$/g, "");
 }
 
-function normalizeTags(raw: string): string[] {
-  return raw
-    .split(",")
+/**
+ * ✅ SAME FIX as Portfolio:
+ * - Keep a raw string input (tagsText) so separators don't get wiped by join(", ")
+ * - Parse tags onBlur + onSave
+ */
+function parseTags(input: string) {
+  return (input || "")
+    .trim()
+    .split(/[,;\n]+|\s+/g) // comma OR spaces OR enter OR semicolon
     .map((t) => t.trim())
     .filter(Boolean)
     .slice(0, 25);
@@ -77,6 +83,16 @@ export default function CaseStudyEditor({
 
   const [saving, setSaving] = useState(false);
 
+  // ✅ tags raw text (fix)
+  const [tagsText, setTagsText] = useState<string>(() =>
+    (initial.tags || []).join(", ")
+  );
+
+  // keep tagsText synced if initial changes
+  useEffect(() => {
+    setTagsText((initial.tags || []).join(", "));
+  }, [initial.tags]);
+
   // cover image upload (cloudinary)
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [localPreview, setLocalPreview] = useState<string>("");
@@ -87,11 +103,15 @@ export default function CaseStudyEditor({
   }, [localPreview, v.image]);
 
   // ✅ keep slug in sync with title (ONLY if user hasn't manually edited slug)
-  const [slugTouched, setSlugTouched] = useState<boolean>(() => !!initial.slug?.trim());
+  const [slugTouched, setSlugTouched] = useState<boolean>(
+    () => !!initial.slug?.trim()
+  );
+
   useEffect(() => {
     if (!slugTouched) {
       setV((prev) => ({ ...prev, slug: toSlug(prev.title) }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [v.title, slugTouched]);
 
   async function handlePickFile(file: File | null) {
@@ -105,6 +125,8 @@ export default function CaseStudyEditor({
 
   const slugError = !v.slug?.trim();
   const titleError = !v.title?.trim();
+
+  const liveTags = useMemo(() => parseTags(tagsText), [tagsText]);
 
   return (
     <div className="bg-white">
@@ -128,8 +150,12 @@ export default function CaseStudyEditor({
                 let coverUrl = v.image || "";
                 if (imageFile) coverUrl = await uploadToCloudinary(imageFile);
 
+                // ✅ FIX: parse tags right before saving
+                const fixedTags = parseTags(tagsText);
+
                 await onSave({
                   ...v,
+                  tags: fixedTags,
                   slug: toSlug(v.slug || v.title), // ✅ ensure safe slug
                   image: coverUrl || "",
                 });
@@ -137,6 +163,10 @@ export default function CaseStudyEditor({
                 if (localPreview) URL.revokeObjectURL(localPreview);
                 setLocalPreview("");
                 setImageFile(null);
+
+                // normalize UI after save
+                setV((prev) => ({ ...prev, tags: fixedTags, image: coverUrl || "" }));
+                setTagsText(fixedTags.join(", "));
               } finally {
                 setSaving(false);
               }
@@ -186,7 +216,10 @@ export default function CaseStudyEditor({
 
               <div className="mt-2 flex items-center justify-between gap-3 text-xs">
                 <div className="text-zinc-500 truncate">
-                  Preview: <span className="text-zinc-700">/case-studies/{v.slug || "…"}</span>
+                  Preview:{" "}
+                  <span className="text-zinc-700">
+                    /case-studies/{v.slug || "…"}
+                  </span>
                 </div>
 
                 {!slugTouched ? (
@@ -215,17 +248,26 @@ export default function CaseStudyEditor({
               />
             </Card>
 
-            <Card title="Tags" subtitle="Comma separated (e.g. UI/UX, Branding, React)">
+            {/* ✅ FIXED TAGS (same as portfolio) */}
+            <Card
+              title="Tags"
+              subtitle="Type tags with space / comma / enter (e.g. UI UX Branding React)"
+            >
               <input
-                placeholder="UI/UX, Branding, React"
+                placeholder="UI UX Branding React"
                 className="mt-2 h-12 w-full rounded-2xl border border-zinc-200 bg-white px-4 text-sm text-zinc-900 outline-none transition focus:border-zinc-400"
-                value={v.tags.join(", ")}
-                onChange={(e) => setV({ ...v, tags: normalizeTags(e.target.value) })}
+                value={tagsText}
+                onChange={(e) => setTagsText(e.target.value)}
+                onBlur={() => {
+                  const parsed = parseTags(tagsText);
+                  setV((prev) => ({ ...prev, tags: parsed }));
+                  setTagsText(parsed.join(", "));
+                }}
               />
 
-              {v.tags.length ? (
+              {liveTags.length ? (
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {v.tags.map((t) => (
+                  {liveTags.map((t) => (
                     <span
                       key={t}
                       className="inline-flex items-center rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs text-zinc-700"
@@ -329,7 +371,8 @@ export default function CaseStudyEditor({
             </Card>
 
             <p className="text-xs text-zinc-500">
-              Tip: Add Cloudinary domain to next.config remotePatterns and restart dev server.
+              Tip: Add Cloudinary domain to next.config remotePatterns and restart
+              dev server.
             </p>
           </div>
         </div>

@@ -46,13 +46,13 @@ export default function TestimonialEditor({
   return (
     <div className="bg-white">
       {/* Top bar */}
-      <div className="flex flex-col gap-3 border-b border-zinc-200 bg-white p-4 sm:p-6">
-        <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-3 border-b border-zinc-200 bg-white p-3 sm:p-4 md:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div>
-            <h2 className="text-lg sm:text-xl font-semibold tracking-tight text-zinc-900">
+            <h2 className="text-base font-semibold tracking-tight text-zinc-900 sm:text-lg md:text-xl">
               New Testimonial
             </h2>
-            <p className="mt-1 text-sm text-zinc-600">
+            <p className="mt-0.5 text-xs text-zinc-600 sm:mt-1 sm:text-sm">
               Add a review with optional link toggle.
             </p>
           </div>
@@ -78,21 +78,21 @@ export default function TestimonialEditor({
                 setSaving(false);
               }
             }}
-            className="inline-flex items-center justify-center rounded-2xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-zinc-800 active:scale-[0.99] disabled:opacity-60"
+            className="inline-flex w-full items-center justify-center rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-800 active:scale-[0.99] disabled:opacity-60 sm:w-auto sm:rounded-2xl"
           >
             {saving ? "Saving..." : "Save Testimonial"}
           </button>
         </div>
       </div>
 
-      <div className="p-4 sm:p-6">
-        <div className="grid gap-6 lg:grid-cols-12">
+      <div className="p-3 sm:p-4 md:p-6">
+        <div className="grid gap-4 sm:gap-5 md:gap-6 lg:grid-cols-12">
           {/* Left */}
-          <div className="lg:col-span-7 space-y-5">
+          <div className="space-y-4 sm:space-y-5 lg:col-span-7">
             <Card title="Person / Company name">
               <input
                 placeholder="e.g. Acme Inc. / John Doe"
-                className="mt-2 h-12 w-full rounded-2xl border border-zinc-200 bg-white px-4 text-sm text-zinc-900 outline-none transition focus:border-zinc-400"
+                className="mt-2 h-10 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm text-zinc-900 outline-none transition focus:border-zinc-400 sm:h-12 sm:rounded-2xl sm:px-4"
                 value={v.name}
                 onChange={(e) => setV({ ...v, name: e.target.value })}
               />
@@ -101,20 +101,20 @@ export default function TestimonialEditor({
             <Card title="Review text">
               <textarea
                 placeholder="Write the testimonial..."
-                className="mt-2 w-full rounded-2xl border border-zinc-200 bg-white p-4 text-sm text-zinc-900 outline-none transition focus:border-zinc-400 min-h-[240px]"
+                className="mt-2 w-full rounded-xl border border-zinc-200 bg-white p-3 text-sm text-zinc-900 outline-none transition focus:border-zinc-400 min-h-[160px] sm:min-h-[240px] sm:rounded-2xl sm:p-4"
                 value={v.text}
                 onChange={(e) => setV({ ...v, text: e.target.value })}
               />
             </Card>
 
             <Card title="Optional link">
-              <div className="mt-2 flex items-center justify-between gap-4 rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3">
+              <div className="mt-2 flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2.5 sm:gap-4 sm:rounded-2xl sm:px-4 sm:py-3">
                 <div>
-                  <div className="text-sm font-medium text-zinc-900">
+                  <div className="text-xs font-medium text-zinc-900 sm:text-sm">
                     Enable link
                   </div>
-                  <div className="text-xs text-zinc-500">
-                    Show “Visit” link on the testimonial.
+                  <div className="text-[10px] text-zinc-500 sm:text-xs">
+                    Show &quot;Visit&quot; link on the testimonial.
                   </div>
                 </div>
 
@@ -127,7 +127,7 @@ export default function TestimonialEditor({
                       linkUrl: !v.linkEnabled ? v.linkUrl || "" : "",
                     })
                   }
-                  className={`relative h-7 w-12 rounded-full border transition ${
+                  className={`relative h-7 w-12 shrink-0 rounded-full border transition ${
                     v.linkEnabled
                       ? "bg-emerald-500 border-emerald-500"
                       : "bg-white border-zinc-200"
@@ -144,7 +144,7 @@ export default function TestimonialEditor({
               <input
                 disabled={!v.linkEnabled}
                 placeholder="https://company.com (optional)"
-                className={`mt-3 h-12 w-full rounded-2xl border px-4 text-sm outline-none transition ${
+                className={`mt-2 h-10 w-full rounded-xl border px-3 text-sm outline-none transition sm:mt-3 sm:h-12 sm:rounded-2xl sm:px-4 ${
                   v.linkEnabled
                     ? "border-zinc-200 bg-white text-zinc-900 focus:border-zinc-400"
                     : "border-zinc-200 bg-zinc-50 text-zinc-500"
@@ -156,14 +156,14 @@ export default function TestimonialEditor({
 
             <Card title="Publish">
               <div className="mt-2 flex items-center justify-between">
-                <div className="text-sm text-zinc-700">
+                <div className="text-xs text-zinc-700 sm:text-sm">
                   {v.published ? "Published" : "Draft"}
                 </div>
 
                 <button
                   type="button"
                   onClick={() => setV({ ...v, published: !v.published })}
-                  className={`relative h-7 w-12 rounded-full border transition ${
+                  className={`relative h-7 w-12 shrink-0 rounded-full border transition ${
                     v.published
                       ? "bg-emerald-500 border-emerald-500"
                       : "bg-zinc-100 border-zinc-200"
@@ -180,9 +180,9 @@ export default function TestimonialEditor({
           </div>
 
           {/* Right */}
-          <div className="lg:col-span-5 space-y-5">
+          <div className="space-y-4 sm:space-y-5 lg:col-span-5">
             <Card title="Photo / Company logo" subtitle="Upload to Cloudinary on save.">
-              <div className="mt-3 overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50">
+              <div className="mt-2 overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50 sm:mt-3 sm:rounded-2xl">
                 <div className="relative aspect-[4/3]">
                   {previewSrc ? (
                     <Image
@@ -193,15 +193,15 @@ export default function TestimonialEditor({
                       sizes="(max-width: 1024px) 100vw, 420px"
                     />
                   ) : (
-                    <div className="absolute inset-0 grid place-items-center text-sm text-zinc-500">
+                    <div className="absolute inset-0 grid place-items-center text-xs text-zinc-500 sm:text-sm">
                       No image selected
                     </div>
                   )}
                 </div>
               </div>
 
-              <div className="mt-4 grid gap-2">
-                <label className="cursor-pointer rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-900 shadow-sm hover:bg-zinc-50 transition">
+              <div className="mt-3 grid gap-2 sm:mt-4">
+                <label className="cursor-pointer rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-center text-xs font-semibold text-zinc-900 shadow-sm transition hover:bg-zinc-50 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
                   <input
                     type="file"
                     accept="image/*"
@@ -218,7 +218,7 @@ export default function TestimonialEditor({
                       handlePickFile(null);
                       setV({ ...v, image: "" });
                     }}
-                    className="rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 transition"
+                    className="rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-50 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm"
                   >
                     Remove image
                   </button>
@@ -242,10 +242,10 @@ function Card({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-3xl border border-zinc-200 bg-white p-4 sm:p-5 shadow-sm">
+    <section className="rounded-xl border border-zinc-200 bg-white p-3 shadow-sm sm:rounded-2xl sm:p-4 md:rounded-3xl md:p-5">
       <div>
-        <div className="text-sm font-semibold text-zinc-900">{title}</div>
-        {subtitle ? <div className="mt-1 text-xs text-zinc-500">{subtitle}</div> : null}
+        <div className="text-xs font-semibold text-zinc-900 sm:text-sm">{title}</div>
+        {subtitle ? <div className="mt-0.5 text-[10px] text-zinc-500 sm:mt-1 sm:text-xs">{subtitle}</div> : null}
       </div>
       {children}
     </section>

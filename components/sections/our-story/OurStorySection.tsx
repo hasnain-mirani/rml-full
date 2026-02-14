@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
@@ -71,21 +71,7 @@ export default function OurStoryPage() {
       {/* ✅ Layout container */}
       <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-16 md:pt-20">
         {/* ✅ Back button (top-left, aligned) */}
-        <div className="flex items-center justify-start">
-          <Link
-            href="/"
-            className={cn(
-              "inline-flex items-center gap-2 rounded-full px-4 py-2",
-              "bg-white/50 backdrop-blur-md",
-              "border border-white/40 shadow-sm",
-              "text-sm font-medium text-[var(--purple)]",
-              "transition hover:bg-white/70 active:translate-y-[1px]"
-            )}
-          >
-            <span className="text-base">←</span>
-            Back to Home Page
-          </Link>
-        </div>
+        
 
         {/* ✅ Video card centered */}
         <div className="mt-8 flex justify-center">

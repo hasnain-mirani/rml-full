@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { uploadToCloudinary } from "@/lib/uploadToCloudinary";
 
@@ -23,9 +23,15 @@ function uid() {
   return `${Date.now()}_${Math.random().toString(16).slice(2)}`;
 }
 
+/**
+ * ✅ Tags parsing:
+ * - Works with spaces, commas, semicolons, newlines
+ * - Returns clean array of strings (max 30)
+ */
 function parseTags(input: string) {
-  return input
-    .split(",")
+  return (input || "")
+    .trim()
+    .split(/[,;\n]+|\s+/g)
     .map((t) => t.trim())
     .filter(Boolean)
     .slice(0, 30);
@@ -40,6 +46,14 @@ export default function PortfolioEditor({
 }) {
   const [v, setV] = useState<PortfolioItem>(initial);
   const [saving, setSaving] = useState(false);
+
+  // ✅ FIX: keep raw text state for tags input so typing separators doesn't get overwritten by join(", ")
+  const [tagsText, setTagsText] = useState<string>(() => initial.tags.join(", "));
+
+  // keep tagsText synced if initial changes (rare, but safe)
+  useEffect(() => {
+    setTagsText((initial.tags || []).join(", "));
+  }, [initial.tags]);
 
   // cover image upload (cloudinary)
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -74,7 +88,9 @@ export default function PortfolioEditor({
   function updateBlock(id: string, patch: any) {
     setV((prev) => ({
       ...prev,
-      content_blocks: prev.content_blocks.map((b) => (b.id === id ? { ...b, ...patch } : b)),
+      content_blocks: prev.content_blocks.map((b) =>
+        b.id === id ? { ...b, ...patch } : b
+      ),
     }));
   }
 
@@ -84,6 +100,9 @@ export default function PortfolioEditor({
       content_blocks: prev.content_blocks.filter((b) => b.id !== id),
     }));
   }
+
+  // ✅ derived tags (for chips preview) without mutating state while typing
+  const liveTags = useMemo(() => parseTags(tagsText), [tagsText]);
 
   return (
     <div className="bg-white">
@@ -107,11 +126,18 @@ export default function PortfolioEditor({
                 let imageUrl = v.image || "";
                 if (imageFile) imageUrl = await uploadToCloudinary(imageFile);
 
-                await onSave({ ...v, image: imageUrl });
+                // ✅ FIX: parse tags right before saving, so DB always gets string[]
+                const fixedTags = parseTags(tagsText);
+
+                await onSave({ ...v, tags: fixedTags, image: imageUrl });
 
                 if (localPreview) URL.revokeObjectURL(localPreview);
                 setLocalPreview("");
                 setImageFile(null);
+
+                // normalize tagsText after save
+                setTagsText(fixedTags.join(", "));
+                setV((prev) => ({ ...prev, tags: fixedTags, image: imageUrl }));
               } finally {
                 setSaving(false);
               }
@@ -145,17 +171,27 @@ export default function PortfolioEditor({
               />
             </Card>
 
-            <Card title="Tags" subtitle="Comma separated (e.g. Next.js, UI, SaaS)">
+            {/* ✅ FIXED TAGS */}
+            <Card
+              title="Tags"
+              subtitle="Type tags with space / comma / enter (e.g. Next.js React UI SaaS)"
+            >
               <input
-                placeholder="Next.js, React, UI, SaaS"
+                placeholder="Next.js React UI SaaS"
                 className="mt-2 h-12 w-full rounded-2xl border border-zinc-200 bg-white px-4 text-sm text-zinc-900 outline-none transition focus:border-zinc-400"
-                value={v.tags.join(", ")}
-                onChange={(e) => setV({ ...v, tags: parseTags(e.target.value) })}
+                value={tagsText}
+                onChange={(e) => setTagsText(e.target.value)}
+                onBlur={() => {
+                  // normalize on blur
+                  const parsed = parseTags(tagsText);
+                  setV((prev) => ({ ...prev, tags: parsed }));
+                  setTagsText(parsed.join(", "));
+                }}
               />
 
-              {v.tags.length ? (
+              {liveTags.length ? (
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {v.tags.map((t) => (
+                  {liveTags.map((t) => (
                     <span
                       key={t}
                       className="inline-flex rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs text-zinc-700"
@@ -358,7 +394,9 @@ function Card({
     <section className="rounded-3xl border border-zinc-200 bg-white p-4 sm:p-5 shadow-sm">
       <div>
         <div className="text-sm font-semibold text-zinc-900">{title}</div>
-        {subtitle ? <div className="mt-1 text-xs text-zinc-500">{subtitle}</div> : null}
+        {subtitle ? (
+          <div className="mt-1 text-xs text-zinc-500">{subtitle}</div>
+        ) : null}
       </div>
       {children}
     </section>

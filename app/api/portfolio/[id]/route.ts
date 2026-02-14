@@ -5,6 +5,7 @@ import { Portfolio } from "@/models/portfolio";
 
 export const dynamic = "force-dynamic";
 
+/** Next params might be Promise (same as testimonial) */
 type Ctx = { params: Promise<{ id: string }> | { id: string } };
 
 function serialize(doc: any) {
@@ -28,7 +29,33 @@ function isObjectId(id: string) {
 
 async function getId(ctx: Ctx) {
   const p = await ctx.params;
-  return cleanId(p?.id);
+  return cleanId((p as any)?.id);
+}
+
+function isNonEmptyString(v: unknown): v is string {
+  return typeof v === "string" && v.trim().length > 0;
+}
+
+/** ✅ whitelist portfolio fields (adjust if your schema differs) */
+function pickPatch(body: any) {
+  const patch: any = {
+    title: typeof body.title === "string" ? body.title.trim() : undefined,
+    excerpt: typeof body.excerpt === "string" ? body.excerpt.trim() : undefined,
+    image: typeof body.image === "string" ? body.image.trim() : undefined,
+    published: typeof body.published === "boolean" ? body.published : undefined,
+
+    tags: Array.isArray(body.tags)
+      ? body.tags
+          .map((t: any) => (isNonEmptyString(t) ? t.trim() : ""))
+          .filter(Boolean)
+          .slice(0, 30)
+      : undefined,
+
+    content_blocks: Array.isArray(body.content_blocks) ? body.content_blocks : undefined,
+  };
+
+  Object.keys(patch).forEach((k) => patch[k] === undefined && delete patch[k]);
+  return patch;
 }
 
 export async function PUT(req: Request, ctx: Ctx) {
@@ -46,7 +73,9 @@ export async function PUT(req: Request, ctx: Ctx) {
       return NextResponse.json({ message: "Invalid body" }, { status: 400 });
     }
 
-    const updated = await Portfolio.findByIdAndUpdate(id, body, {
+    const patch = pickPatch(body);
+
+    const updated = await Portfolio.findByIdAndUpdate(id, patch, {
       new: true,
       runValidators: true,
     });

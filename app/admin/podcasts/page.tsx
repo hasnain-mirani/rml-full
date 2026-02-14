@@ -57,13 +57,14 @@ export default async function AdminPodcastsPage() {
               </div>
 
               <div className="col-span-2 flex justify-end gap-2">
-                <Link
+                <a
                   href={`/podcasts/${p.slug}?preview=1`}
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="rounded-xl border border-zinc-200 px-3 py-1 text-xs hover:bg-zinc-50"
                 >
                   View
-                </Link>
+                </a>
 
                 <Link
                   href={`/admin/podcasts/${p.slug}`}

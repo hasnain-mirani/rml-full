@@ -1,6 +1,7 @@
 import { getBaseUrl } from "@/lib/getBaseUrl";
 
 export type PortfolioItem = {
+  _id: string; // ✅ MUST
   title: string;
   slug: string;
   excerpt: string;
@@ -16,6 +17,8 @@ export type PortfolioItem = {
     alt?: string;
   }>;
 };
+
+
 
 type ApiList = { items?: PortfolioItem[] };
 type ApiOne = { item?: PortfolioItem };

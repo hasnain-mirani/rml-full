@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 /**
  * These IDs MUST match the Home page sections:
@@ -17,8 +17,8 @@ type NavLink = { label: string; id: SlideId };
 /** ✅ REORDERED + UNIQUE IDs (no duplicates) */
 const navLinks: NavLink[] = [
   { label: "Home", id: "hero" },
-  { label: "About Us", id: "features" },
-  { label: "Services", id: "process" },
+  { label: "Services", id: "features" },
+  { label: "About Us", id: "process" },
   { label: "Resources", id: "cta" },
   { label: "Testimonals", id: "stories" },
   { label: "Contact Us", id: "footer" },
@@ -32,17 +32,14 @@ function setHash(id: string) {
 export default function Navbar({
   scrollContainerRef,
 }: {
-  scrollContainerRef: React.RefObject<HTMLDivElement | null>;
+  scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
 }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeId, setActiveId] = useState<SlideId>("hero");
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  const lastY = useRef(0);
 
   // sync from hash once
   useEffect(() => {
@@ -57,21 +54,16 @@ export default function Navbar({
     setDrawerOpen(false);
   }, [pathname]);
 
-  // hide/show + active sync from the home scroll container
+  // active section sync from the home scroll container
   useEffect(() => {
-    const el = scrollContainerRef.current;
+    const el = scrollContainerRef?.current;
     if (!el) return;
 
     let raf = 0;
 
     const onScroll = () => {
       const y = el.scrollTop;
-
       setScrolled(y > 8);
-
-      if (y > lastY.current && y > 120) setHidden(true);
-      else if (y < lastY.current) setHidden(false);
-      lastY.current = y;
 
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
@@ -117,7 +109,7 @@ export default function Navbar({
       return;
     }
 
-    const container = scrollContainerRef.current;
+    const container = scrollContainerRef?.current;
     if (!container) {
       // fallback hash update
       setActiveId(id);
@@ -150,11 +142,7 @@ export default function Navbar({
   }, [activeId, pathname]);
 
   return (
-    <motion.header
-      className="fixed top-0 z-50 w-full"
-      animate={hidden ? { y: -96, opacity: 0 } : { y: 0, opacity: 1 }}
-      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-    >
+    <header className="fixed top-0 z-50 w-full">
       <div className="mx-auto max-w-6xl px-4 pt-4 md:pt-6">
         <div
           className={cn(
@@ -296,6 +284,6 @@ export default function Navbar({
           </>
         )}
       </AnimatePresence>
-    </motion.header>
+    </header>
   );
 }

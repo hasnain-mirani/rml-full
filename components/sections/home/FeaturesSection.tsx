@@ -51,33 +51,33 @@ export default function FeaturesSection() {
   );
 
   return (
-    <section className="relative w-full bg-white">
+    <section className="relative flex h-full min-h-[100svh] w-full flex-col bg-white md:min-h-screen">
       {/* soft background */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(1200px_600px_at_30%_10%,rgba(111,42,167,0.10),transparent_60%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(900px_500px_at_70%_40%,rgba(0,0,0,0.06),transparent_60%)]" />
       </div>
 
-      {/* ⛔ height unchanged (same container) */}
-      <div className="relative mx-auto max-w-6xl px-4 py-14 md:py-20">
-        {/* ✅ heading centered + bigger (ONLY section heading changed) */}
+      {/* Main content — fills viewport, pushes below navbar */}
+      <div className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center px-4 pb-8 pt-24 sm:pt-28 md:pb-12 md:pt-28">
+        {/* Heading */}
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-xs font-medium tracking-[0.22em] text-black/55">
+          <p className="text-[10px] font-medium tracking-[0.22em] text-black/55 sm:text-xs">
             PATHS WE OFFER
           </p>
 
-          <h2 className="mt-4 font-display font-semibold tracking-tight text-black text-[44px] leading-[1.05] md:text-[64px]">
+          <h2 className="mt-3 font-display font-semibold tracking-tight text-black text-2xl leading-[1.1] sm:mt-4 sm:text-[36px] md:text-[48px] lg:text-[64px]">
             Choose the way you want to build
           </h2>
 
-          <p className="mt-4 text-sm leading-relaxed text-black/60 md:text-base">
+          <p className="mt-3 text-xs leading-relaxed text-black/60 sm:mt-4 sm:text-sm md:text-base">
             Two engagement modes — both designed to deliver real outcomes with
             clear milestones.
           </p>
         </div>
 
-        {/* main card */}
-        <div className="relative mt-10 overflow-hidden rounded-3xl border border-black/10 bg-white/70 shadow-[0_25px_80px_rgba(0,0,0,0.10)] backdrop-blur-xl">
+        {/* main card — grows to fill remaining space */}
+        <div className="relative mt-6 flex flex-1 flex-col overflow-hidden rounded-2xl border border-black/10 bg-white/70 shadow-[0_25px_80px_rgba(0,0,0,0.10)] backdrop-blur-xl sm:mt-8 sm:rounded-3xl md:mt-10">
           {/* top sheen */}
           {!reduce && (
             <motion.div
@@ -93,50 +93,49 @@ export default function FeaturesSection() {
             />
           )}
 
-          {/* ✅ content vertically centered (NO height change) */}
-          <div className="grid min-h-[520px] grid-cols-1 md:grid-cols-2">
-            {/* SCALE */}
+          {/* ✅ content vertically centered — fills card */}
+          <div className="grid flex-1 grid-cols-1 md:grid-cols-2">
+            {/* SCALE — dark purple bg, white text */}
             <div
               className={cn(
                 "group relative text-left",
-                "p-8 md:p-10",
-                "flex items-center", // ✅ center inside column
+                "p-5 sm:p-7 md:p-10",
+                "flex items-center",
                 "transition-opacity duration-200",
                 open && !isScale ? "opacity-60" : "opacity-100"
               )}
             >
-              {/* gradient panel */}
-              <div className="absolute inset-0 bg-[radial-gradient(900px_500px_at_40%_20%,rgba(111,42,167,0.18),transparent_60%)]" />
-              <div className="absolute inset-0 bg-gradient-to-br from-[#F6EEFF] via-white to-white" />
+              {/* dark purple background */}
+              <div className="absolute inset-0 bg-[#6F2AA7]" />
+              <div className="absolute inset-0 bg-[radial-gradient(900px_500px_at_40%_20%,rgba(255,255,255,0.08),transparent_60%)]" />
 
               <div className="relative w-full">
-                <p className="text-xs font-medium tracking-[0.18em] text-[#6F2AA7]/70">
+                <p className="text-[10px] font-medium tracking-[0.18em] text-white/70 sm:text-xs">
                   {content.scale.eyebrow}
                 </p>
 
-                {/* ⛔ untouched: only section heading requested */}
-                <h3 className="mt-3 font-display text-3xl font-semibold leading-[1.1] text-[#6F2AA7] md:text-4xl">
+                <h3 className="mt-2 font-display text-xl font-semibold leading-[1.1] text-white sm:mt-3 sm:text-2xl md:text-3xl lg:text-4xl">
                   {content.scale.title}
                 </h3>
 
-                <p className="mt-4 max-w-[420px] text-sm leading-relaxed text-black/60 md:text-base">
+                <p className="mt-2 max-w-[420px] text-xs leading-relaxed text-white/70 sm:mt-3 sm:text-sm md:mt-4 md:text-base">
                   {content.scale.desc}
                 </p>
 
-                <div className="mt-6 flex flex-wrap gap-2">
-                  <Tag tone="purple">Architecture</Tag>
-                  <Tag tone="purple">Deployment</Tag>
-                  <Tag tone="purple">Reliability</Tag>
+                <div className="mt-4 flex flex-wrap gap-1.5 sm:mt-5 sm:gap-2 md:mt-6">
+                  <Tag tone="light">Architecture</Tag>
+                  <Tag tone="light">Deployment</Tag>
+                  <Tag tone="light">Reliability</Tag>
                 </div>
 
-                <div className="mt-10">
+                <div className="mt-5 sm:mt-7 md:mt-10">
                   <button
                     type="button"
                     onClick={handlers.onScaleClick}
                     className={cn(
-                      "inline-flex h-11 items-center justify-center rounded-full px-6 text-sm font-medium",
-                      "border border-[#6F2AA7]/20 bg-white/70 text-[#6F2AA7] shadow-sm backdrop-blur",
-                      "transition hover:bg-white active:translate-y-[1px]"
+                      "inline-flex h-9 items-center justify-center rounded-full px-5 text-xs font-medium sm:h-10 sm:px-6 sm:text-sm md:h-11",
+                      "border border-white/25 bg-white/15 text-white shadow-sm backdrop-blur",
+                      "transition hover:bg-white/25 active:translate-y-[1px]"
                     )}
                   >
                     {isScale ? "Hide details" : "View details"}
@@ -149,8 +148,8 @@ export default function FeaturesSection() {
             <div
               className={cn(
                 "group relative text-left",
-                "p-8 md:p-10",
-                "flex items-center", // ✅ center inside column
+                "p-5 sm:p-7 md:p-10",
+                "flex items-center",
                 "transition-opacity duration-200",
                 open && !isInnovate ? "opacity-60" : "opacity-100"
               )}
@@ -159,31 +158,30 @@ export default function FeaturesSection() {
               <div className="absolute inset-0 bg-gradient-to-br from-[#F7F7F7] via-white to-white" />
 
               <div className="relative w-full">
-                <p className="text-xs font-medium tracking-[0.18em] text-black/55">
+                <p className="text-[10px] font-medium tracking-[0.18em] text-black/55 sm:text-xs">
                   {content.innovate.eyebrow}
                 </p>
 
-                {/* ⛔ untouched */}
-                <h3 className="mt-3 font-display text-3xl font-semibold leading-[1.1] text-black md:text-4xl">
+                <h3 className="mt-2 font-display text-xl font-semibold leading-[1.1] text-black sm:mt-3 sm:text-2xl md:text-3xl lg:text-4xl">
                   {content.innovate.title}
                 </h3>
 
-                <p className="mt-4 max-w-[420px] text-sm leading-relaxed text-black/60 md:text-base">
+                <p className="mt-2 max-w-[420px] text-xs leading-relaxed text-black/60 sm:mt-3 sm:text-sm md:mt-4 md:text-base">
                   {content.innovate.desc}
                 </p>
 
-                <div className="mt-6 flex flex-wrap gap-2">
+                <div className="mt-4 flex flex-wrap gap-1.5 sm:mt-5 sm:gap-2 md:mt-6">
                   <Tag tone="dark">Discovery</Tag>
                   <Tag tone="dark">Prototype</Tag>
                   <Tag tone="dark">Launch</Tag>
                 </div>
 
-                <div className="mt-10">
+                <div className="mt-5 sm:mt-7 md:mt-10">
                   <button
                     type="button"
                     onClick={handlers.onInnovateClick}
                     className={cn(
-                      "inline-flex h-11 items-center justify-center rounded-full px-6 text-sm font-medium",
+                      "inline-flex h-9 items-center justify-center rounded-full px-5 text-xs font-medium sm:h-10 sm:px-6 sm:text-sm md:h-11",
                       "border border-black/10 bg-white/70 text-black shadow-sm backdrop-blur",
                       "transition hover:bg-white active:translate-y-[1px]"
                     )}
@@ -223,7 +221,7 @@ export default function FeaturesSection() {
                     "shadow-[0_30px_90px_rgba(0,0,0,0.18)]"
                   )}
                 >
-                  <div className="p-6 md:p-8">
+                  <div className="p-4 sm:p-6 md:p-8">
                     <div className="flex items-start justify-between gap-6">
                       <div>
                         <p
@@ -321,15 +319,17 @@ function Tag({
   tone,
 }: {
   children: React.ReactNode;
-  tone: "purple" | "dark";
+  tone: "purple" | "dark" | "light";
 }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-medium tracking-wide",
+        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-medium tracking-wide sm:px-3 sm:py-1 sm:text-[11px]",
         tone === "purple"
           ? "border-[#6F2AA7]/20 bg-[#6F2AA7]/10 text-[#6F2AA7]"
-          : "border-black/10 bg-black/5 text-black/70"
+          : tone === "light"
+            ? "border-white/25 bg-white/15 text-white"
+            : "border-black/10 bg-black/5 text-black/70"
       )}
     >
       {children}

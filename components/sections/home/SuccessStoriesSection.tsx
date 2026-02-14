@@ -24,10 +24,6 @@ function StoryCard({ s }: { s: Story }) {
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(600px_220px_at_25%_20%,rgba(111,42,167,0.10),transparent_60%)]" />
 
-      <div className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full border border-black/10 bg-white/80 shadow-[0_10px_24px_rgba(0,0,0,0.10)] backdrop-blur">
-        <span className="text-[18px] leading-none text-black/50">×</span>
-      </div>
-
       <div className="relative px-6 py-7">
         <div className="flex items-center gap-3">
           <div className="h-11 w-11 overflow-hidden rounded-full border border-black/10 bg-[#F2E8FF]">
@@ -46,7 +42,6 @@ function StoryCard({ s }: { s: Story }) {
             <p className="truncate text-[15px] font-semibold text-black">
               {s.name}
             </p>
-            <div className="mt-1 h-px w-[140px] bg-black/10" />
           </div>
         </div>
 

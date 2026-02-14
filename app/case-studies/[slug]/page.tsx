@@ -3,14 +3,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { fetchCaseStudyBySlug } from "@/lib/fetchCaseStudies";
 
-type Params = { slug: string };
+type Params = Promise<{ slug: string }>;
 
 export default async function CaseStudyDetail({
   params,
 }: {
   params: Params;
 }) {
-  const item = await fetchCaseStudyBySlug(params.slug);
+  const { slug } = await params;
+  const item = await fetchCaseStudyBySlug(slug);
 
   if (!item) notFound();
 
