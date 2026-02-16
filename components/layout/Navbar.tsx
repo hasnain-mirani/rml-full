@@ -40,6 +40,22 @@ export default function Navbar({
   const [scrolled, setScrolled] = useState(false);
   const [activeId, setActiveId] = useState<SlideId>("hero");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [showTestimonials, setShowTestimonials] = useState(true);
+
+  // fetch testimonials visibility setting
+  useEffect(() => {
+    fetch("/api/settings?key=showTestimonials", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && typeof data.value === "boolean") setShowTestimonials(data.value);
+      })
+      .catch(() => {});
+  }, []);
+
+  const visibleLinks = useMemo(
+    () => (showTestimonials ? navLinks : navLinks.filter((l) => l.id !== "stories")),
+    [showTestimonials]
+  );
 
   // sync from hash once
   useEffect(() => {
@@ -138,8 +154,8 @@ export default function Navbar({
 
   const activeLabel = useMemo(() => {
     if (pathname !== "/") return "Menu";
-    return navLinks.find((l) => l.id === activeId)?.label ?? "Menu";
-  }, [activeId, pathname]);
+    return visibleLinks.find((l) => l.id === activeId)?.label ?? "Menu";
+  }, [activeId, pathname, visibleLinks]);
 
   return (
     <header className="fixed top-0 z-50 w-full">
@@ -166,7 +182,7 @@ export default function Navbar({
 
           {/* Desktop nav */}
           <nav className="hidden h-full flex-1 items-center md:flex">
-            {navLinks.map((l) => {
+            {visibleLinks.map((l) => {
               const active = pathname === "/" ? activeId === l.id : false;
 
               return (
@@ -253,7 +269,7 @@ export default function Navbar({
               </div>
 
               <nav className="px-2 py-2">
-                {navLinks.map((l) => {
+                {visibleLinks.map((l) => {
                   const active = pathname === "/" ? activeId === l.id : false;
                   return (
                     <button

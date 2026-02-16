@@ -46,14 +46,7 @@ export default function FooterSection() {
               </Button>
             </Link>
           
-          <Link href='/case-studies'>
-            <Button
-              variant="outline"
-              className="h-11 rounded-full px-6 md:px-8 border-black/15"
-            >
-              View case studies
-            </Button>
-          </Link>
+        
           </div>
         </div>
       </div>

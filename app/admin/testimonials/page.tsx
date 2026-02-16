@@ -19,6 +19,8 @@ export default function AdminTestimonialsPage() {
   const [items, setItems] = useState<TestimonialRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
+  const [showInNavbar, setShowInNavbar] = useState(true);
+  const [toggling, setToggling] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -28,8 +30,27 @@ export default function AdminTestimonialsPage() {
     setLoading(false);
   }
 
+  async function loadVisibility() {
+    const res = await fetch("/api/settings?key=showTestimonials", { cache: "no-store" });
+    const data = await res.json().catch(() => null);
+    if (data) setShowInNavbar(data.value !== false);
+  }
+
+  async function toggleVisibility() {
+    setToggling(true);
+    const newVal = !showInNavbar;
+    const res = await fetch("/api/settings", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key: "showTestimonials", value: newVal }),
+    });
+    if (res.ok) setShowInNavbar(newVal);
+    setToggling(false);
+  }
+
   useEffect(() => {
     load();
+    loadVisibility();
   }, []);
 
   async function handleDelete(id: string) {
@@ -67,12 +88,35 @@ export default function AdminTestimonialsPage() {
             </p>
           </div>
 
-          <Link
-            href="/admin/testimonials/new"
-            className="rounded-2xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-900 shadow-sm hover:bg-zinc-50 hover:border-zinc-300 transition"
-          >
-            + New Testimonial
-          </Link>
+          <div className="flex items-center gap-3">
+            {/* Navbar visibility toggle */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-zinc-500 whitespace-nowrap">
+                {showInNavbar ? "Visible in Navbar" : "Hidden from Navbar"}
+              </span>
+              <button
+                type="button"
+                disabled={toggling}
+                onClick={toggleVisibility}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-60 ${
+                  showInNavbar ? "bg-purple-600" : "bg-zinc-300"
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                    showInNavbar ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
+
+            <Link
+              href="/admin/testimonials/new"
+              className="rounded-2xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-900 shadow-sm hover:bg-zinc-50 hover:border-zinc-300 transition"
+            >
+              + New Testimonial
+            </Link>
+          </div>
         </div>
 
         <div className="mt-8 rounded-3xl border border-zinc-200 bg-white overflow-hidden">

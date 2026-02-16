@@ -24,16 +24,30 @@ function clamp(n: number, min: number, max: number) {
 }
 
 export default function FullpageHome() {
+  const [showTestimonials, setShowTestimonials] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/settings?key=showTestimonials", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && typeof data.value === "boolean") setShowTestimonials(data.value);
+      })
+      .catch(() => {});
+  }, []);
+
   const sections: SectionDef[] = useMemo(
-    () => [
-      { id: "hero", node: <HeroSlide />, bg: "bg-transparent" }, 
-      { id: "features", node: <FeaturesSection />, bg: "bg-white" },
-      { id: "process", node: <ProcessSection />, bg: "bg-[var(--purple)]" },
-      { id: "cta", node: <CTASection />, bg: "bg-white" },
-      { id: "stories", node: <SuccessStoriesSection />, bg: "bg-white" },
-      { id: "footer", node: <Footer />, bg: "bg-white" },
-    ],
-    [],
+    () => {
+      const all: SectionDef[] = [
+        { id: "hero", node: <HeroSlide />, bg: "bg-transparent" },
+        { id: "features", node: <FeaturesSection />, bg: "bg-white" },
+        { id: "process", node: <ProcessSection />, bg: "bg-[var(--purple)]" },
+        { id: "cta", node: <CTASection />, bg: "bg-white" },
+        { id: "stories", node: <SuccessStoriesSection />, bg: "bg-white" },
+        { id: "footer", node: <Footer />, bg: "bg-white" },
+      ];
+      return showTestimonials ? all : all.filter((s) => s.id !== "stories");
+    },
+    [showTestimonials],
   );
 
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -316,7 +330,7 @@ function HeroSlide({ onNext }: { onNext?: () => void }) {
   const titleWrapRef = useRef<HTMLDivElement | null>(null);
   const [waveTop, setWaveTop] = useState<number>(0);
 
-  // Text/icon motion (unchanged)
+  // Text/icon motion
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
@@ -416,7 +430,7 @@ function HeroSlide({ onNext }: { onNext?: () => void }) {
         </div>
       </div>
 
-      {/* ICONS (same positions) */}
+      {/* ICONS */}
       <div className="relative z-[2] mx-auto mt-6 max-w-6xl px-4">
         <div className="relative mx-auto h-[360px] w-full max-w-[980px] md:h-[520px]">
           {/* center */}

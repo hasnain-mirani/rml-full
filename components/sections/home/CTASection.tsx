@@ -30,11 +30,11 @@ const cards: CtaCard[] = [
     href: "/podcasts",
   },
   {
-    id: "portfolio",
-    title: "Portfolio",
+    id: "Case Studies",
+    title: "Case Studies",
     desc: "Explore real outcomes, measurable results, and practical case studies that show what production-grade AI looks like.",
     image: "/images/cta-portfolio.png",
-    href: "/portfolio",
+    href: "/case-studies",
   },
 ];
 
