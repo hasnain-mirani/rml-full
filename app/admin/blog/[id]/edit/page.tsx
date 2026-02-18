@@ -1,18 +1,17 @@
 import AdminTopbar from "@/components/admin/AdminTopbar";
 import EditBlogClient from "@/components/blog/EditBlogClient";
 
-export default function EditBlogPage({
+export default async function EditBlogPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
+
   return (
     <div>
-      <AdminTopbar
-        title="Edit Blog"
-        subtitle="Update blog post"
-      />
-      <EditBlogClient id={params.id} />
+      <AdminTopbar title="Edit Blog" subtitle="Update blog post" />
+      <EditBlogClient id={id} />
     </div>
   );
 }

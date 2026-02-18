@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import Navbar from "@/components/layout/Navbar";
+import ComingSoon from "@/components/ui/ComingSoon";
 
 type CaseStudy = {
   _id?: string;
@@ -158,12 +159,10 @@ export default function CaseStudiesClient({
             <div className="mt-1 break-words">{errorMsg}</div>
           </div>
         ) : items.length === 0 ? (
-          <div className="mt-6 rounded-2xl border border-neutral-200 bg-neutral-50 p-10 text-center">
-            <div className="text-lg font-semibold">No published case studies yet</div>
-            <div className="mt-2 text-sm text-neutral-600">
-              Publish a case study from the admin panel and it will appear here.
-            </div>
-          </div>
+          <ComingSoon
+            title="Case Studies Coming Soon"
+            subtitle="We're documenting our best builds and outcomes. Check back soon!"
+          />
         ) : (
           <>
             <div className="mt-6 grid gap-8 lg:grid-cols-12">

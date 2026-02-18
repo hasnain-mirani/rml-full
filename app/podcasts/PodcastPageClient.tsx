@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import Navbar from "@/components/layout/Navbar";
+import ComingSoon from "@/components/ui/ComingSoon";
 import type { Podcast } from "@/lib/fetchPodcasts";
 
 type Props = {
@@ -128,12 +129,10 @@ export default function PodcastPageClient({ initialItems, errorMsg = "" }: Props
             <div className="mt-1 break-words">{errorMsg}</div>
           </div>
         ) : items.length === 0 ? (
-          <div className="mt-6 rounded-2xl border border-neutral-200 bg-neutral-50 p-10 text-center">
-            <div className="text-lg font-semibold">No published podcasts yet</div>
-            <div className="mt-2 text-sm text-neutral-600">
-              Publish a podcast from the admin panel and it will appear here.
-            </div>
-          </div>
+          <ComingSoon
+            title="Podcasts Coming Soon"
+            subtitle="We're preparing episodes packed with interviews and insights. Stay tuned!"
+          />
         ) : (
           <>
             <div className="mt-6 grid gap-8 lg:grid-cols-12">

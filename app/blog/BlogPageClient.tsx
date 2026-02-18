@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import type { Blog } from "@/lib/fetchBlogs";
 import Navbar from "@/components/layout/Navbar";
+import ComingSoon from "@/components/ui/ComingSoon";
 
 type Props = {
   initialBlogs: Blog[];
@@ -127,12 +128,10 @@ export default function BlogPageClient({ initialBlogs, errorMsg = "" }: Props) {
             <div className="mt-1 break-words">{errorMsg}</div>
           </div>
         ) : blogs.length === 0 ? (
-          <div className="mt-6 rounded-2xl border border-neutral-200 bg-neutral-50 p-10 text-center">
-            <div className="text-lg font-semibold">No published posts yet</div>
-            <div className="mt-2 text-sm text-neutral-600">
-              Publish a blog from the admin panel and it will appear here.
-            </div>
-          </div>
+          <ComingSoon
+            title="Blog Coming Soon"
+            subtitle="We're crafting insightful articles and stories. Stay tuned for our latest posts!"
+          />
         ) : (
           <>
             <div className="mt-6 grid gap-8 lg:grid-cols-12">
